@@ -30,6 +30,9 @@ namespace NASClientTCP
         public Form1()
         {
             InitializeComponent();
+            listView1.View = View.Details;
+            listView1.HeaderStyle = ColumnHeaderStyle.None;
+            listView1.Columns.Add(new ColumnHeader { Width = listView1.ClientSize.Width - SystemInformation.VerticalScrollBarWidth });
         }
 
         private void button1_Click(object sender, EventArgs e)
