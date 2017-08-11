@@ -33,6 +33,7 @@
             this.directorySearcher1 = new System.DirectoryServices.DirectorySearcher();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.listView1 = new System.Windows.Forms.ListView();
+            this.button3 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // button1
@@ -77,11 +78,22 @@
             this.listView1.TabIndex = 4;
             this.listView1.UseCompatibleStateImageBehavior = false;
             // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(431, 13);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(75, 23);
+            this.button3.TabIndex = 5;
+            this.button3.Text = "ping serwer";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.pingserver);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(531, 304);
+            this.Controls.Add(this.button3);
             this.Controls.Add(this.listView1);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.button2);
@@ -100,6 +112,7 @@
         private System.DirectoryServices.DirectorySearcher directorySearcher1;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ListView listView1;
+        private System.Windows.Forms.Button button3;
     }
 }
 
