@@ -212,5 +212,12 @@ namespace NASClientTCP
         {
             Run();
         }
+
+        private async void pingserver(object sender, EventArgs e)
+        {
+            Progress<string> progress = new Progress<string>(text => listView1.Items.Add(text));
+            PingServer ps = new PingServer(progress);
+            await ps.TestPing();
+        }
     }
 }

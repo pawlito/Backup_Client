@@ -84,6 +84,7 @@
     <Compile Include="Helpers.cs" />
     <Compile Include="IbytesConvertable.cs" />
     <Compile Include="IhashGenerator.cs" />
+    <Compile Include="PingServer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">
