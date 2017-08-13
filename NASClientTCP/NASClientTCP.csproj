@@ -71,6 +71,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AppEvents.cs" />
     <Compile Include="ClientInfo.cs" />
     <Compile Include="ClsFileInformation.cs" />
     <Compile Include="CompareItems.cs" />
