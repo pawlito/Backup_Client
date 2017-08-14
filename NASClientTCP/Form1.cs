@@ -27,6 +27,7 @@ namespace NASClientTCP
         int portNum = int.Parse(ConfigurationManager.AppSettings["port"]);
         string ipAddress = ConfigurationManager.AppSettings["server"].ToString();
         private DbWrapper db;
+        AppEvents ae = new AppEvents("backupAppLog", "AppLocal");
         List<string> toBackup = new List<string>();
         public Form1()
         {
@@ -34,6 +35,8 @@ namespace NASClientTCP
             listView1.View = View.Details;
             listView1.HeaderStyle = ColumnHeaderStyle.None;
             listView1.Columns.Add(new ColumnHeader { Width = listView1.ClientSize.Width - SystemInformation.VerticalScrollBarWidth });
+            ae.WriteToLog("App startup", System.Diagnostics.EventLogEntryType.Information, 
+                AppEvents.CategoryType.AppStartUp, AppEvents.EventIDType.ExceptionThrown);
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -51,11 +54,15 @@ namespace NASClientTCP
                 int compResult = int.MinValue;
                 Hashtable row = new Hashtable();
                 row = db.SelectRow(files[i].Name.ToString());
-      
+                ae.WriteToLog("Got data from DB", System.Diagnostics.EventLogEntryType.Information,
+                    AppEvents.CategoryType.ReadFromDB, AppEvents.EventIDType.ExceptionThrown);
+
                 if (row.ContainsKey("fileName") && row.ContainsValue(files[i].Name.ToString()))
                 {
                     fileStream3 = new FileStream(@"C:\Users\paweł\Desktop\test\" + files[i].Name.ToString(), FileMode.OpenOrCreate,
                     FileAccess.Read);
+                    ae.WriteToLog("Read file stream", System.Diagnostics.EventLogEntryType.Information,
+                        AppEvents.CategoryType.ReadFromFile, AppEvents.EventIDType.ExceptionThrown);
                     hash = GetChecksumBuffered(fileStream3);
                     fileStream3.Close();
                     state = ci.CompareStrings(row["checksum"].ToString(), hash);
@@ -70,8 +77,12 @@ namespace NASClientTCP
                     toBackup.Add(files[i].Name.ToString());
                 }
             }
+            ae.WriteToLog("Backup initialized", System.Diagnostics.EventLogEntryType.Information,
+                AppEvents.CategoryType.None, AppEvents.EventIDType.ExceptionThrown);
             if (toBackup.Count > 0)
             {
+                ae.WriteToLog("Backup needed", System.Diagnostics.EventLogEntryType.Information,
+                    AppEvents.CategoryType.None, AppEvents.EventIDType.ExceptionThrown);
                 string message = Helpers.BuildMessage(toBackup);
                 MessageBox.Show("pliki wymagajace wykonania kopii: \n" + message);
             }
@@ -82,11 +93,15 @@ namespace NASClientTCP
                 if (result == DialogResult.Yes)
                 {
                     RunManualBackup();
+                    ae.WriteToLog("Backup initialized manualy", System.Diagnostics.EventLogEntryType.Information,
+                        AppEvents.CategoryType.UserInput, AppEvents.EventIDType.ExceptionThrown);
                 }
                 else if (result == DialogResult.No)
                 {
                     MessageBox.Show(" kopia nie została wykonana\n anulowano", "komunikat",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    ae.WriteToLog("Backup canceled", System.Diagnostics.EventLogEntryType.Information,
+                        AppEvents.CategoryType.UserInput, AppEvents.EventIDType.ExceptionThrown);
                 }
                 else if (result == DialogResult.Cancel)
                 {
@@ -120,7 +135,8 @@ namespace NASClientTCP
                 _client.Close();
             }*/
 
-
+            ae.WriteToLog("Backup done(mode-auto)", System.Diagnostics.EventLogEntryType.Information,
+                AppEvents.CategoryType.None, AppEvents.EventIDType.ExceptionThrown);
         }
 
         public void RunManualBackup()
@@ -135,7 +151,8 @@ namespace NASClientTCP
                 HandleCommunication(files[i].Name.ToString(), directory);
                 _client.Close();
             }
-
+            ae.WriteToLog("Backup done(mode-manual)", System.Diagnostics.EventLogEntryType.Information,
+                AppEvents.CategoryType.None, AppEvents.EventIDType.ExceptionThrown);
 
         }
         public void HandleCommunication(string fileName2, string directory)
@@ -145,11 +162,13 @@ namespace NASClientTCP
             {
                 file = new FileInfo(directory + fileName2);
                 fileStream = file.OpenRead();
+                ae.WriteToLog("File to backup opened", System.Diagnostics.EventLogEntryType.Information,
+                    AppEvents.CategoryType.ReadFromFile, AppEvents.EventIDType.ExceptionThrown);
             }
             catch
             {
-                //MessageBox.Show("Error opening file");
-                //resetControls();
+                ae.WriteToLog("IO error", System.Diagnostics.EventLogEntryType.Error,
+                    AppEvents.CategoryType.None, AppEvents.EventIDType.ExceptionThrown);
                 return;
             }
             _sReader = new StreamReader(_client.GetStream(), Encoding.ASCII);
@@ -178,10 +197,15 @@ namespace NASClientTCP
                 FileAccess.Read);
             hash = GetChecksumBuffered(fileStream2);
             fileStream2.Close();
+            ae.WriteToLog("File to backup closed", System.Diagnostics.EventLogEntryType.Information,
+               AppEvents.CategoryType.None, AppEvents.EventIDType.ExceptionThrown);
+
             db.UpInsert("Files", fileName2, hash.ToString(), 0, file.LastWriteTime.ToString());
+            ae.WriteToLog("store/update data in DB", System.Diagnostics.EventLogEntryType.Information,
+               AppEvents.CategoryType.WriteToDB, AppEvents.EventIDType.ExceptionThrown);
             ////////////////////////////////////////////////////////////////////////////////////////
             //str = "";
-            
+
             _client.Close();
         }
         public byte[] GetBytesFromString(string str)
@@ -222,6 +246,13 @@ namespace NASClientTCP
             Progress<string> progress = new Progress<string>(text => listView1.Items.Add(text));
             PingServer ps = new PingServer(progress);
             await ps.TestPing();
+        }
+
+        private void close(object sender, EventArgs e)
+        {
+            ae.WriteToLog("App closed", System.Diagnostics.EventLogEntryType.Information,
+               AppEvents.CategoryType.AppShutDown, AppEvents.EventIDType.ExceptionThrown);
+            Application.Exit();
         }
     }
 }
