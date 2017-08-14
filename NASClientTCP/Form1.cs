@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Data.SQLite;
 using System.IO;
@@ -23,8 +24,8 @@ namespace NASClientTCP
         private FileStream fileStream;
         private FileStream fileStream2;
         private FileStream fileStream3;
-        int portNum = 5555;
-        string ipAddress = "127.0.0.1";
+        int portNum = int.Parse(ConfigurationManager.AppSettings["port"]);
+        string ipAddress = ConfigurationManager.AppSettings["server"].ToString();
         private DbWrapper db;
         List<string> toBackup = new List<string>();
         public Form1()
@@ -39,7 +40,7 @@ namespace NASClientTCP
         {
             CompareItems ci = new CompareItems();
             Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            db = new DbWrapper(@"C:\Users\paweł\Documents\Visual Studio 2015\Projects\NASClientTCP\NASClientTCP\bin\filesInfo.sqlite");
+            db = new DbWrapper(ConfigurationManager.AppSettings["dbpath"].ToString() + ConfigurationManager.AppSettings["database"].ToString());
             DirectoryInfo di = new DirectoryInfo(@"C:\Users\paweł\Desktop\test");
             FileInfo[] files = di.GetFiles();
 
