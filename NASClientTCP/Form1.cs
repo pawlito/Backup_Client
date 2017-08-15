@@ -141,11 +141,11 @@ namespace NASClientTCP
 
         public void RunManualBackup()
         {
-            DirectoryInfo di = new DirectoryInfo(@"C:\Users\paweł\Desktop\test");
+            DirectoryInfo di = new DirectoryInfo(@"C:\Users\paweł\Desktop\test\");
             FileInfo[] files = di.GetFiles();
             for (int i = 0; i < 5; i++)
             {
-                string directory = @"C:\Users\paweł\Desktop\test";
+                string directory = @"C:\Users\paweł\Desktop\test\";
                 _client = new TcpClient();
                 _client.Connect(ipAddress, portNum);
                 HandleCommunication(files[i].Name.ToString(), directory);
