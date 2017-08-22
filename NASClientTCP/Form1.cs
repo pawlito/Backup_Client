@@ -185,7 +185,7 @@ namespace NASClientTCP
             ns.Write(fileName, 0, fileName.Length);
             int read;
             int totalWritten = 0;
-            byte[] buffer = new byte[32 * 1024]; // 32k chunks
+            byte[] buffer = new byte[32 * 1024]; // 32k chunks - prawdopodobnie do poprawki
             while ((read = fileStream.Read(buffer, 0, buffer.Length)) > 0)
             {
                 ns.Write(buffer, 0, read);
